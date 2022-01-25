@@ -35,6 +35,7 @@ public class Robot extends TimedRobot {
 
   //CLASS VARIABLES:
   private Drive drive;
+  private Camera camera1;
   private Joystick joystick;
 
 
@@ -56,6 +57,7 @@ public class Robot extends TimedRobot {
 
     //CLASS INITIALIZATIONS:
     drive = new Drive(leftDriveMotor1, leftDriveMotor2, rightDriveMotor1, rightDriveMotor2);
+    camera1 = new Camera(0);
     joystick = new Joystick(0);
   }
 
