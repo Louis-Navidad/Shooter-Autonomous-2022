@@ -35,9 +35,10 @@ public class Robot extends TimedRobot {
 
   //CLASS VARIABLES:
   private Drive drive;
-  private Camera camera1;
   private Joystick joystick;
-
+  private Camera camera1;
+  private Limelight limelight;
+  
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -57,8 +58,9 @@ public class Robot extends TimedRobot {
 
     //CLASS INITIALIZATIONS:
     drive = new Drive(leftDriveMotor1, leftDriveMotor2, rightDriveMotor1, rightDriveMotor2);
-    camera1 = new Camera(0);
     joystick = new Joystick(0);
+    camera1 = new Camera(0);
+    limelight = new Limelight();
   }
 
   /**
@@ -69,7 +71,9 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    limelight.run();
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
