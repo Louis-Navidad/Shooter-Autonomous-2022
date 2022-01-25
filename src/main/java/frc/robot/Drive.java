@@ -26,7 +26,7 @@ public class Drive {
     }
 
     public void arcadeRun(double xChannel, double yChannel){
-        diffDrive.arcadeDrive(deadzone(xChannel), deadzone(yChannel));
+        diffDrive.arcadeDrive(-deadzone(xChannel), deadzone(yChannel));
     }
 
     public void tankRun(double leftChannel, double rightChannel){
