@@ -1,13 +1,27 @@
 package frc.robot;
 
+import javax.sound.sampled.LineEvent;
+
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public class Shooter {
 
+    //MOTOR VARIABLES
     private MotorController intakeMotor;
     private MotorController shooterMotor;
+
+    //CLASS VARIABLES
+    private Limelight limelight;
     
-    public Shooter(MotorController newIntakeMotor, MotorController newShooterMotor){
+    //CONSTANTS
+    private final double cameraHeight = 0;
+    private final double targetHeight = 0;
+    private final double cameraAngleDegrees = 0;
+    private final double shooterAngleDegrees = 0;
+    private final double flywheelRadiusFeet = 0;
+
+    public Shooter(Limelight newlimelight, MotorController newIntakeMotor, MotorController newShooterMotor){
+        limelight = newlimelight;
         intakeMotor = newIntakeMotor;
         shooterMotor = newShooterMotor;
     }
@@ -28,6 +42,30 @@ public class Shooter {
 
     public void shoot(){
         shooterState = state.SHOOT;
+    }
+
+    public double getDistance(){
+        double heightDiff = targetHeight - cameraHeight;
+        double cameraAngleRad = Math.toRadians(cameraAngleDegrees);
+        double angleDiffRad = Math.toRadians(limelight.getYOffset());
+
+        return (heightDiff/Math.tan(cameraAngleRad + angleDiffRad));
+
+    }
+
+    public double getIdealVelocity(){
+        double heightDiff = targetHeight - cameraHeight;
+        double distance = getDistance();
+        double shooterAngleRad = Math.toRadians(shooterAngleDegrees);
+        
+        return Math.sqrt((16*distance*distance)/((Math.sin(shooterAngleRad) * Math.tan(shooterAngleRad)) - (Math.pow(Math.cos(shooterAngleRad), 2) * heightDiff))); 
+        
+    }
+
+    public double getIdealRPM(){
+        double velocity = getIdealVelocity();
+        
+        return (30 * velocity)/(Math.PI * flywheelRadiusFeet);
     }
 
     private void stopMotors(){
