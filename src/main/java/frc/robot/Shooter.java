@@ -12,11 +12,11 @@ public class Shooter {
     private Limelight limelight;
     
     //CONSTANTS
-    private final double cameraHeight = 0;
-    private final double targetHeight = 0;
-    private final double cameraAngleDegrees = 0;
-    private final double shooterAngleDegrees = 0;
-    private final double flywheelRadiusFeet = 0;
+    private final double cameraHeight = 2.2916667; //TEST VALUES 
+    private final double targetHeight = 4.3541667;
+    private final double cameraAngleDegrees = 17.6;
+    private final double shooterAngleDegrees = 17.6;
+    private final double flywheelRadiusFeet = 0.2708333;
 
     public Shooter(Limelight newlimelight, MotorController newIntakeMotor, MotorController newShooterMotor){
         limelight = newlimelight;
@@ -62,7 +62,7 @@ public class Shooter {
         double shooterAngleRad = Math.toRadians(shooterAngleDegrees);
         
         if(distance > 0){
-            return Math.sqrt((16*distance*distance)/((Math.sin(shooterAngleRad) * Math.tan(shooterAngleRad)) - (Math.pow(Math.cos(shooterAngleRad), 2) * heightDiff))); 
+            return Math.sqrt((16*distance*distance)/((Math.sin(shooterAngleRad) * Math.cos(shooterAngleRad) * distance) - (Math.pow(Math.cos(shooterAngleRad), 2) * heightDiff))); 
         }
 
         else{
