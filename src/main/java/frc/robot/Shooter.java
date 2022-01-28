@@ -1,7 +1,5 @@
 package frc.robot;
 
-import javax.sound.sampled.LineEvent;
-
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public class Shooter {
@@ -49,8 +47,13 @@ public class Shooter {
         double cameraAngleRad = Math.toRadians(cameraAngleDegrees);
         double angleDiffRad = Math.toRadians(limelight.getYOffset());
 
-        return (heightDiff/Math.tan(cameraAngleRad + angleDiffRad));
+        if(limelight.checkTargetSeen()){
+            return (heightDiff/Math.tan(cameraAngleRad + angleDiffRad));
+        }
 
+        else{
+            return -1;
+        }
     }
 
     public double getIdealVelocity(){
@@ -58,13 +61,17 @@ public class Shooter {
         double distance = getDistance();
         double shooterAngleRad = Math.toRadians(shooterAngleDegrees);
         
-        return Math.sqrt((16*distance*distance)/((Math.sin(shooterAngleRad) * Math.tan(shooterAngleRad)) - (Math.pow(Math.cos(shooterAngleRad), 2) * heightDiff))); 
-        
+        if(distance > 0){
+            return Math.sqrt((16*distance*distance)/((Math.sin(shooterAngleRad) * Math.tan(shooterAngleRad)) - (Math.pow(Math.cos(shooterAngleRad), 2) * heightDiff))); 
+        }
+
+        else{
+            return 0;
+        }
     }
 
     public double getIdealRPM(){
         double velocity = getIdealVelocity();
-        
         return (30 * velocity)/(Math.PI * flywheelRadiusFeet);
     }
 
