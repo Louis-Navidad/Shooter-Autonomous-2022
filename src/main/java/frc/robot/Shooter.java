@@ -12,6 +12,7 @@ public class Shooter {
 
     //CLASS VARIABLES
     private Limelight limelight;
+    private Intake intake;
 
     //CONSTANTS
     private final double cameraHeight = 0;
@@ -27,9 +28,10 @@ public class Shooter {
     private final double distanceFromLaunchPadtoHub = 0;
 
     //CONSTRUCTOR: the shooter will use one FALCON 500 Motor for the flywheel and will use the limelight to aim
-    public Shooter(Limelight newlimelight, WPI_TalonFX newShooterMotor){    
+    public Shooter(Limelight newlimelight, WPI_TalonFX newShooterMotor, Intake newIntake){    
         limelight = newlimelight;
         shooterMotor = newShooterMotor;
+        intake = newIntake;
     }
 
     //STATES: the shooter will either shoot with a set speed from the launch pad, adjust its RPM according to the limelight, or not shoot at all 
@@ -131,7 +133,7 @@ public class Shooter {
         double setSpeed = (getIdealRPM(getIdealVelocity(getDistance() + 2)) * 2048)/600;
         
         if(checkIfRPMWithinRange() && checkIfWithinShootingDistance()){
-            //set intake to feed
+            intake.setFeedingMode();
         }
         else{
             shooterMotor.set(ControlMode.Velocity, setSpeed);
@@ -144,7 +146,7 @@ public class Shooter {
         double lowerLimit = getIdealRPM(getIdealVelocity(distanceFromLaunchPadtoHub - 1));
     
         if(getActualRPM() > lowerLimit && getActualRPM() < upperLimit){
-            //set intake to feed
+            intake.setFeedingMode();
         }
         else{
             shooterMotor.set(ControlMode.Velocity, setSpeed);
