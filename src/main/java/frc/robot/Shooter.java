@@ -36,7 +36,7 @@ public class Shooter {
 
     //STATES: the shooter will either shoot with a set speed from the launch pad, adjust its RPM according to the limelight, or not shoot at all 
     private enum state{
-        STOP, LOWHUBSHOOT, ADJUSTANDSHOOT, LAUNCHPADSHOOT
+        STOP, LOWHUBSHOOT, ADJUSTANDSHOOT, LAUNCHPADSHOOT, TESTING
     }
 
     private state shooterState = state.STOP; //default state will be set to STOP
@@ -55,6 +55,14 @@ public class Shooter {
 
     public void setLaunchPadShoot(){
         shooterState = state.LAUNCHPADSHOOT;
+    }
+
+    public void setTesting(){
+        shooterState = state.TESTING;
+    }
+
+    public void setSpeedManual(double input){
+        shooterMotor.set(input);
     }
 
     //Method to calculate the distance from the ball to the rim of the upper hub
@@ -166,6 +174,9 @@ public class Shooter {
             break;
             case LAUNCHPADSHOOT:
                 launchPadShoot();
+            break;
+            case TESTING:
+
             break;
         }
 
