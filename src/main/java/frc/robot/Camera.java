@@ -10,11 +10,16 @@ public class Camera {
 
     public Camera(int width, int height, int port){
         camera = CameraServer.startAutomaticCapture(port);
+        camera.setExposureAuto();
         camera.setVideoMode(PixelFormat.kMJPEG, width, height, 30);
     }
     
     public Camera(int port){
         this(160, 120, port);
+    }
+
+    public void setExposure(int exposureValue){
+        camera.setExposureManual(exposureValue);
     }
 
     public void setResolution(int width, int height){
