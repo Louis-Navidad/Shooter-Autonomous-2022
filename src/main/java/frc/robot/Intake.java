@@ -8,11 +8,16 @@ public class Intake {
 
     private MotorController intakeMotor; // the intake motor
     private DigitalInput holdSwitch; // limit switch
-    private double intakeSpeed = 0.4; // the speed of the intake motor
+    private double intakeSpeed = 0.6; // the speed of the intake motor
 
     public Intake(MotorController newIntakeMotor, DigitalInput newHoldSwitch){
         intakeMotor = newIntakeMotor;
         holdSwitch = newHoldSwitch;
+    }
+
+    //TEMPORARY CONSTRUCTOR
+    public Intake(MotorController newIntakeMotor){
+        intakeMotor = newIntakeMotor;
     }
 
     public enum state{ // states of the intake
@@ -75,6 +80,11 @@ public class Intake {
         }
     }
 
+    //TEMPORARY FEEDING METHOD
+    private void tempFeeding(){
+        intake(-intakeSpeed);
+    }
+
     public void displayMethod(){
         SmartDashboard.putBoolean("Limit switch", cargoCheck()); // displays if the limit switch is being triggered
         SmartDashboard.putString("Mode", mode.toString()); // displays the current state of the intake
@@ -92,7 +102,8 @@ public class Intake {
             break;
 
             case FEEDING: // sets intake to feeding stage
-            feeding();
+            //feeding();
+            tempFeeding();
             break;
 
             case STOP: // sets motor to stop stage
