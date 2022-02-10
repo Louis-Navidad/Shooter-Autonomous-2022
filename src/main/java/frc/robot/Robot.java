@@ -5,17 +5,20 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //MOTOR IMPORTS:
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 //OTHER IMPORTS:
 import edu.wpi.first.wpilibj.Joystick;
+import com.kauailabs.navx.frc.AHRS;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -30,10 +33,14 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   //MOTOR VARIABLES:
+
+  //drive
   private CANSparkMax leftDriveMotor1;
   private CANSparkMax leftDriveMotor2;
   private CANSparkMax rightDriveMotor1;
   private CANSparkMax rightDriveMotor2;
+  private RelativeEncoder encoder;
+  //shooter + intake
   private WPI_TalonFX shooterMotor;
   private WPI_TalonSRX intakeMotor;
 
@@ -43,6 +50,12 @@ public class Robot extends TimedRobot {
   private Limelight limelight;
   private Shooter shooter;
   private Intake intake;
+  private AHRS navX;
+  private Autonomous autonomous;
+  private Camera camera;
+
+  //OTHERS
+  private final double encCountsPerFoot = 3.15872823333;
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -55,11 +68,15 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     //MOTOR INITIALIZATIONS:
+    
+    //drive
     leftDriveMotor1 = new CANSparkMax(6, MotorType.kBrushless);         //using ports on practice robot
-    leftDriveMotor2 = new CANSparkMax(15, MotorType.kBrushless);
+    leftDriveMotor2 = new CANSparkMax(15, MotorType.kBrushless);  
     rightDriveMotor1 = new CANSparkMax(16, MotorType.kBrushless);
     rightDriveMotor2 = new CANSparkMax(3, MotorType.kBrushless);
-
+    encoder = rightDriveMotor2.getEncoder();
+  
+    //shooter + intake
     shooterMotor = new WPI_TalonFX(1);
     intakeMotor = new WPI_TalonSRX(8);
 
@@ -68,7 +85,11 @@ public class Robot extends TimedRobot {
     joystick = new Joystick(0);
     limelight = new Limelight();
     intake = new Intake(intakeMotor);
-    shooter = new Shooter(limelight, shooterMotor, intake);
+    shooter = new Shooter(limelight, shooterMotor, drive);
+    navX = new AHRS(Port.kMXP);
+    autonomous = new Autonomous(drive, shooter, intake, encoder, navX);
+    camera = new Camera(0);
+    
     
   }
 
@@ -81,19 +102,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
-    if(joystick.getRawButton(9)){
-      limelight.setDrivingMode();
-    }
-    else if(joystick.getRawButton(10)){
-      limelight.setTrackingMode();
-    }
-
-    shooter.displayValues();
-
     limelight.run();
-    shooter.run();
-    intake.run();
+    autonomous.display();
   }
 
   /**
@@ -109,8 +119,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    autonomous.reset();
   }
 
   /** This function is called periodically during autonomous. */
@@ -125,6 +137,8 @@ public class Robot extends TimedRobot {
         // Put default auto code here
         break;
     }
+
+    autonomous.run();
   }
 
   /** This function is called once when teleop is enabled. */
@@ -134,22 +148,29 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    drive.arcadeRun(joystick.getX(), joystick.getY());
+    drive.arcadeControl(joystick.getX(), joystick.getY()); 
+    if(joystick.getRawButton(11)){
+      navX.reset();
+    }
 
     if(joystick.getRawButton(1)){
-      shooter.setUpperHubShoot();
-    }
-    else if(joystick.getPOV() == 180){
       shooter.setLowHubShoot();
-    }
-    else if(joystick.getPOV() == 0){
-      shooter.setLaunchPadShoot();
     }
     else{
       shooter.setStop();
-      intake.setStopMode();
     }
-    
+
+    if(joystick.getRawButton(2)){
+      intakeMotor.set(-0.4);
+    }
+    else if(joystick.getPOV() == 0){
+      intakeMotor.set(0.4);
+    }
+    else{
+      intakeMotor.stopMotor();
+    }
+
+    shooter.run();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -158,7 +179,24 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if(joystick.getRawButton(4)){
+      SmartDashboard.putString("ROUTINE", "ONE BALL");
+      autonomous.setOneBall();
+    }
+    else if(joystick.getRawButton(1)){
+      SmartDashboard.putString("ROUTINE", "TWO BALL");
+      autonomous.setTwoBall();
+    }
+    else if(joystick.getRawButton(2)){
+      SmartDashboard.putString("ROUTINE", "THREE BALL");
+      autonomous.setThreeBall();
+    }
+    else if(joystick.getRawButton(3)){
+      SmartDashboard.putString("ROUTINE", "DO NOTHING");
+      autonomous.setNothing();
+    }
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
