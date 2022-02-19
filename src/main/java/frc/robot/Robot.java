@@ -19,6 +19,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 //OTHER IMPORTS:
 import edu.wpi.first.wpilibj.Joystick;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -32,7 +33,6 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  //MOTOR VARIABLES:
 
   //drive
   private CANSparkMax leftDriveMotor1;
@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
   //shooter + intake
   private WPI_TalonFX shooterMotor;
   private WPI_TalonSRX intakeMotor;
+  private DigitalInput intakeSwitch;
 
   //CLASS VARIABLES:
   private Drive drive;
@@ -52,10 +53,6 @@ public class Robot extends TimedRobot {
   private Intake intake;
   private AHRS navX;
   private Autonomous autonomous;
-  private Camera camera;
-
-  //OTHERS
-  private final double encCountsPerFoot = 3.15872823333;
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -79,17 +76,16 @@ public class Robot extends TimedRobot {
     //shooter + intake
     shooterMotor = new WPI_TalonFX(1);
     intakeMotor = new WPI_TalonSRX(8);
+    intakeSwitch = new DigitalInput(0);
 
     //CLASS INITIALIZATIONS:
     drive = new Drive(leftDriveMotor1, leftDriveMotor2, rightDriveMotor1, rightDriveMotor2);
     joystick = new Joystick(0);
     limelight = new Limelight();
-    intake = new Intake(intakeMotor);
+    intake = new Intake(intakeMotor, intakeSwitch);
     shooter = new Shooter(limelight, shooterMotor, drive);
     navX = new AHRS(Port.kMXP);
     autonomous = new Autonomous(drive, shooter, intake, encoder, navX);
-    camera = new Camera(0);
-    
     
   }
 
@@ -102,7 +98,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    limelight.run();
+    intake.displayMethod();
+    shooter.displayValues();
     autonomous.display();
   }
 
@@ -121,8 +118,6 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
-
-    autonomous.reset();
   }
 
   /** This function is called periodically during autonomous. */
@@ -143,58 +138,77 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    limelight.setDrivingMode();
+  }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     drive.arcadeControl(joystick.getX(), joystick.getY()); 
-    if(joystick.getRawButton(11)){
-      navX.reset();
-    }
 
     if(joystick.getRawButton(1)){
       shooter.setLowHubShoot();
+    }
+    else if(joystick.getRawButton(3)){
+      shooter.setUpperHubShoot();
+    }
+    else if(joystick.getRawButton(4)){
+      shooter.setLaunchPadShoot();
     }
     else{
       shooter.setStop();
     }
 
     if(joystick.getRawButton(2)){
-      intakeMotor.set(-0.4);
+      intake.setOverrideMode();
     }
+    /*else if(joystick.getRawButton(3)){
+      intake.setFeedingMode();
+    }*/
     else if(joystick.getPOV() == 0){
-      intakeMotor.set(0.4);
+      intake.setOutakeMode();
     }
     else{
-      intakeMotor.stopMotor();
+      intake.setStopMode();
     }
 
+    if(joystick.getRawButton(9)){
+      limelight.setDrivingMode();
+    }
+    else if(joystick.getRawButton(10)){
+      limelight.setTrackingMode();
+    }
+
+    limelight.run();
     shooter.run();
+    intake.run();
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    autonomous.reset();
+  }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    if(joystick.getRawButton(4)){
+    if(joystick.getRawButton(5)){
+      SmartDashboard.putString("ROUTINE", "NOTHING");
+      autonomous.setNothing();
+    }
+    else if(joystick.getRawButton(6)){
       SmartDashboard.putString("ROUTINE", "ONE BALL");
       autonomous.setOneBall();
     }
-    else if(joystick.getRawButton(1)){
+    else if(joystick.getRawButton(3)){
       SmartDashboard.putString("ROUTINE", "TWO BALL");
       autonomous.setTwoBall();
     }
-    else if(joystick.getRawButton(2)){
+    else if(joystick.getRawButton(4)){
       SmartDashboard.putString("ROUTINE", "THREE BALL");
       autonomous.setThreeBall();
-    }
-    else if(joystick.getRawButton(3)){
-      SmartDashboard.putString("ROUTINE", "DO NOTHING");
-      autonomous.setNothing();
     }
   }
 
