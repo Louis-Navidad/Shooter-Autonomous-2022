@@ -19,14 +19,15 @@ public class Shooter{
 
     //CONSTANTS (USING TEST VALUES FOR NOW)
     private final double cameraHeight = 1.79166667;             //height of the limelight from the ground
-    private final double targetHeight = 3.72916667;             //height of the target(upper hub)
+    private final double targetHeight = 8.66666667;             //height of the target(upper hub)
     private final double cameraAngleDegrees = 0;                //angle of the limelight to the horizontal
     
     private final double minimumShootingDistance = 0;           //minimum distance ball has to be to clear the rim
     private final double maximumTrackingDistance = 20;          //maximum distance limelight can track accurately
+    private final double cameraToBumperDistance = 0.9375;
 
     private final double lowHubSpeed = -0.4;                    //set speed to shoot in low hub
-    private final double launchPadSpeed = -0.9;                 //set speed to shoot into the upper hub from the LaunchPad
+    private final double launchPadSpeed = -1.0;                 //set speed to shoot into the upper hub from the LaunchPad
 
 
     //CONSTRUCTOR
@@ -87,14 +88,14 @@ public class Shooter{
         
     }
 
-    //Calculates the distance from the CAMERA to the RIM
+    //Calculates the distance from the BUMPER to the CENTER OF THE HUB
     private double getDistance(){
         double heightDiff = targetHeight - cameraHeight;
         double cameraAngleRad = Math.toRadians(cameraAngleDegrees);
         double angleDiffRad = Math.toRadians(limelight.getYOffset());
 
         if(limelight.checkTargetSeen()){
-            return (heightDiff/Math.tan(cameraAngleRad + angleDiffRad));
+            return (heightDiff/Math.tan(cameraAngleRad + angleDiffRad) - cameraToBumperDistance + 2);
         }
         else{
             return -1;
@@ -148,7 +149,7 @@ public class Shooter{
     //stops the shooter
     private void stop(){
         shooterMotor.stopMotor();
-        limelight.setDrivingMode();
+        //limelight.setDrivingMode();
         setSpeed = 0;
         upperLimit = -1;
         lowerLimit = -1;
@@ -157,8 +158,8 @@ public class Shooter{
     //Method to shoot in the low hub
     private void lowHubShoot(){
         setSpeed = lowHubSpeed; 
-        upperLimit = 0;
-        lowerLimit = 0;
+        upperLimit = 2600;
+        lowerLimit = 2200;
         shooterMotor.set(setSpeed); 
     }
 

@@ -22,7 +22,7 @@ public class Autonomous {
     private int threeBallCounter = 0;
 
     //CONSTANTS:
-    private final double encCountsPerFoot = 3.15872823333;
+    private final double encCountsPerFoot = 11.1029532;
     
     public Autonomous(Drive newDrive, Shooter newShooter, Intake newIntake, RelativeEncoder newEncoder, AHRS newGyro){
         drive = newDrive;       
@@ -60,6 +60,7 @@ public class Autonomous {
         SmartDashboard.putNumber("Three Ball Counter", threeBallCounter);
         SmartDashboard.putNumber("Encoder Counts", encoder.getPosition());
         SmartDashboard.putNumber("Gyro Yaw", gyro.getYaw());
+        SmartDashboard.putBoolean("CheckRPM", shooter.checkRPM());
     }
 
     public void reset(){
@@ -82,13 +83,13 @@ public class Autonomous {
         switch(oneBallCounter){
 
             case 0:     //taxi off tarmac
-                if(Math.abs(encoder.getPosition()) >= convertFeetToEncoderCounts(3.33333)){
+                if(Math.abs(encoder.getPosition()) >= convertFeetToEncoderCounts(4)){
                     drive.tankRun(0, 0);
                     encoder.setPosition(0);
                     oneBallCounter++;
                 }
                 else{
-                    drive.tankRun(-0.5, -0.47);
+                    drive.tankRun(-0.6, -0.6);
                 }
             break;
 
@@ -97,7 +98,8 @@ public class Autonomous {
                     oneBallCounter++;
                 }
                 else{
-                    shooter.setUpperHubShoot();
+                    shooter.setLowHubShoot();
+                    //sooter.setUpperHubShoot
                 }
             break;
 
@@ -135,7 +137,8 @@ public class Autonomous {
                     twoBallCounter++;
                 }
                 else{
-                    shooter.setUpperHubShoot();
+                    //shooter.setUpperHubShoot();
+                    shooter.setLowHubShoot();
                 }      
             break;
                 
@@ -200,7 +203,8 @@ public class Autonomous {
                     twoBallCounter++;
                 }
                 else{
-                    shooter.setUpperHubShoot();
+                    //shooter.setUpperHubShoot();
+                    shooter.setLowHubShoot();
                 }
             break;
 

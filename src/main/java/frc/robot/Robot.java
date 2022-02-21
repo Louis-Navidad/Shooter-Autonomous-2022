@@ -20,6 +20,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Joystick;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -44,6 +45,7 @@ public class Robot extends TimedRobot {
   private WPI_TalonFX shooterMotor;
   private WPI_TalonSRX intakeMotor;
   private DigitalInput intakeSwitch;
+  private Timer intakeTimer;
 
   //CLASS VARIABLES:
   private Drive drive;
@@ -76,13 +78,14 @@ public class Robot extends TimedRobot {
     //shooter + intake
     shooterMotor = new WPI_TalonFX(1);
     intakeMotor = new WPI_TalonSRX(8);
-    intakeSwitch = new DigitalInput(0);
+    intakeSwitch = new DigitalInput(2);
+    intakeTimer = new Timer();
 
     //CLASS INITIALIZATIONS:
     drive = new Drive(leftDriveMotor1, leftDriveMotor2, rightDriveMotor1, rightDriveMotor2);
     joystick = new Joystick(0);
     limelight = new Limelight();
-    intake = new Intake(intakeMotor, intakeSwitch);
+    intake = new Intake(intakeMotor, intakeSwitch, intakeTimer);
     shooter = new Shooter(limelight, shooterMotor, drive);
     navX = new AHRS(Port.kMXP);
     autonomous = new Autonomous(drive, shooter, intake, encoder, navX);
@@ -98,9 +101,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    intake.displayMethod();
+    //intake.displayMethod();
     shooter.displayValues();
-    autonomous.display();
+    SmartDashboard.putNumber("Shooter Output", shooterMotor.get());
+    SmartDashboard.putNumber("Encoder Counts", encoder.getPosition());
+    //autonomous.display();
   }
 
   /**
@@ -149,23 +154,27 @@ public class Robot extends TimedRobot {
 
     if(joystick.getRawButton(1)){
       shooter.setLowHubShoot();
-    }
-    else if(joystick.getRawButton(3)){
-      shooter.setUpperHubShoot();
-    }
-    else if(joystick.getRawButton(4)){
-      shooter.setLaunchPadShoot();
-    }
-    else{
-      shooter.setStop();
-    }
-
-    if(joystick.getRawButton(2)){
-      intake.setOverrideMode();
+      //shooterMotor.set(-.795);
     }
     /*else if(joystick.getRawButton(3)){
-      intake.setFeedingMode();
+      //shooter.setUpperHubShoot();
+    }
+    else if(joystick.getRawButton(4)){
+      //shooter.setLaunchPadShoot();
     }*/
+    else{
+      shooter.setStop();
+      //shooterMotor.set(0);
+    }
+    //shooterMotor.set(joystick.getRawAxis(3));
+
+    if(joystick.getRawButton(2)){
+      intake.setFeedingMode();
+      //intake.setOverrideMode();
+    }
+    else if(joystick.getRawButton(3)){
+      intake.setIntakeMode();;
+    }
     else if(joystick.getPOV() == 0){
       intake.setOutakeMode();
     }
@@ -178,6 +187,10 @@ public class Robot extends TimedRobot {
     }
     else if(joystick.getRawButton(10)){
       limelight.setTrackingMode();
+    }
+
+    if(joystick.getRawButton(7)){
+      encoder.setPosition(0);
     }
 
     limelight.run();
