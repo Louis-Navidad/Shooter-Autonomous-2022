@@ -4,6 +4,7 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Autonomous {
 
@@ -15,6 +16,7 @@ public class Autonomous {
     private Drive drive;
     private Shooter shooter;
     private Intake intake;
+    private Timer timer;
 
     //COUNTER VARIABLES:
     private int oneBallCounter = 0;
@@ -30,6 +32,7 @@ public class Autonomous {
         intake = newIntake;
         encoder = newEncoder;
         gyro = newGyro;
+        timer = new Timer();
     }
 
     private enum routines{
@@ -122,13 +125,13 @@ public class Autonomous {
         switch(twoBallCounter){
 
             case 0:     //taxi off tarmac
-                if(Math.abs(encoder.getPosition()) >= convertFeetToEncoderCounts(6)){
+                if(Math.abs(encoder.getPosition()) >= convertFeetToEncoderCounts(6.5)){
                     drive.tankRun(0, 0);
                     encoder.setPosition(0);
                     twoBallCounter++;
                 }
                 else{
-                    drive.tankRun(-0.45, -0.42);
+                    drive.tankRun(-0.6, -0.6);
                 }
             break;
 
@@ -154,13 +157,13 @@ public class Autonomous {
             break;
             
             case 3:     //turn to face the cargo ball
-                if(gyro.getYaw() > 35f && gyro.getYaw() < 45f ){
+                if(gyro.getYaw() > 48f && gyro.getYaw() < 53f ){
                     drive.tankRun(0, 0);   
                     encoder.setPosition(0);
                     twoBallCounter++;
                 }
                 else{
-                    drive.tankRun(0.55, -0.52);
+                    drive.tankRun(0.5, -0.5);
                 }
             break;
 
@@ -172,7 +175,7 @@ public class Autonomous {
                 }
                 else{
                     intake.setIntakeMode();
-                    drive.tankRun(0.4, 0.37);
+                    drive.tankRun(0.5, 0.5);
                 }
             break;
 
@@ -183,7 +186,8 @@ public class Autonomous {
                     twoBallCounter++;
                 }
                 else{
-                    drive.tankRun(-0.5, -0.47);
+                    drive.tankRun(-0.5, -0.5);
+                    twoBallCounter++;
                 }
             break;
 
@@ -194,7 +198,7 @@ public class Autonomous {
                     twoBallCounter++;
                 }
                 else{
-                    drive.tankRun(-0.6, 0.57);
+                    drive.tankRun(-0.5, 0.5);
                 }
             break; 
 
@@ -208,7 +212,17 @@ public class Autonomous {
                 }
             break;
 
-            case 8:     //shoot the ball
+            case 8:
+                if(timer.get() >= 1){
+                    timer.stop();
+                    timer.reset();
+                    twoBallCounter++;
+                }
+                else{
+                    timer.start();
+                    intake.setOverrideMode();
+                }
+            case 9:     //shoot the ball
                 if(intake.cargoCheck()){
                     shooter.setStop();
                     intake.setStopMode();
@@ -216,6 +230,7 @@ public class Autonomous {
                 }
                 else{
                     intake.setFeedingMode();
+                    
                 }
             break;
         }

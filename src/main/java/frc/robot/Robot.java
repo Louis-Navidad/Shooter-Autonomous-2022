@@ -172,8 +172,8 @@ public class Robot extends TimedRobot {
       intake.setFeedingMode();
       //intake.setOverrideMode();
     }
-    else if(joystick.getRawButton(3)){
-      intake.setIntakeMode();;
+    else if(joystick.getRawButton(11)){
+      intake.setIntakeMode();
     }
     else if(joystick.getPOV() == 0){
       intake.setOutakeMode();

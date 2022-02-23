@@ -22,8 +22,8 @@ public class Shooter{
     private final double targetHeight = 8.66666667;             //height of the target(upper hub)
     private final double cameraAngleDegrees = 0;                //angle of the limelight to the horizontal
     
-    private final double minimumShootingDistance = 0;           //minimum distance ball has to be to clear the rim
-    private final double maximumTrackingDistance = 20;          //maximum distance limelight can track accurately
+    private final double minimumShootingDistance = 10;           //minimum distance ball has to be to clear the rim
+    private final double maximumTrackingDistance = 17;          //maximum distance limelight can track accurately
     private final double cameraToBumperDistance = 0.9375;
 
     private final double lowHubSpeed = -0.4;                    //set speed to shoot in low hub
@@ -62,6 +62,10 @@ public class Shooter{
 
     public void setTesting(){
         shooterState = state.TESTING;
+    }
+
+    public void setManual(double input){
+        shooterMotor.set(input);
     }
 
     //Checks if the shooter is spinning fast enough
@@ -136,10 +140,10 @@ public class Shooter{
         limelight.setTrackingMode();
 
         if(getDistance() < minimumShootingDistance){
-            drive.tankRun(-0.5, 0.47);
+            drive.tankRun(-0.6, -0.6);
         }
         else if(getDistance() > maximumTrackingDistance){
-            drive.tankRun(0.5, -0.47);
+            drive.tankRun(0.6, 0.6);
         }
         else{
             drive.tankRun(0, 0);
@@ -169,18 +173,38 @@ public class Shooter{
         //align();
         //getInRange();
 
-        if(getDistance() > minimumShootingDistance && getDistance() < 10){
-            setSpeed = -0.6;
-            upperLimit = 6;
-            lowerLimit = 0;
-        }
-        else if(getDistance() > 7 && getDistance() < 10){
-            setSpeed = -0.7;
+        if(getDistance() > minimumShootingDistance && getDistance() < 11){
+            setSpeed = -0.692;
             upperLimit = 0;
             lowerLimit = 0;
         }
-        else if(getDistance() > 10 && getDistance() < maximumTrackingDistance){
-            setSpeed = -0.8;
+        else if(getDistance() > 11 && getDistance() < 12){
+            setSpeed = -0.725;
+            upperLimit = 0;
+            lowerLimit = 0;
+        }
+        else if(getDistance() > 12 && getDistance() < 13){
+            setSpeed = -0.7618;
+            upperLimit = 0;
+            lowerLimit = 0;
+        }
+        else if(getDistance() > 13 && getDistance() < 14){
+            setSpeed = -0.804;
+            upperLimit = 0;
+            lowerLimit = 0;
+        }
+        else if(getDistance() > 14 && getDistance() < 15){
+            setSpeed = -0.852;
+            upperLimit = 0;
+            lowerLimit = 0;
+        }
+        else if(getDistance() > 15 && getDistance() < 16){
+            setSpeed = -0.906;
+            upperLimit = 0;
+            lowerLimit = 0;
+        }
+        else if(getDistance() > 16 && getDistance() < maximumTrackingDistance){
+            setSpeed = -0.968;
             upperLimit = 0;
             lowerLimit = 0;
         }
@@ -198,8 +222,8 @@ public class Shooter{
         limelight.setTrackingMode();
         //align();
         setSpeed = launchPadSpeed;  
-        upperLimit = 0;
-        lowerLimit = 0;   
+        upperLimit = 6400;
+        lowerLimit = 6200;   
         shooterMotor.set(setSpeed); 
     }
 
