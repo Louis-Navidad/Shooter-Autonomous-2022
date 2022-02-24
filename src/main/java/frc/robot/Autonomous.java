@@ -21,7 +21,8 @@ public class Autonomous {
     //COUNTER VARIABLES:
     private int oneBallCounter = 0;
     private int twoBallCounter = 0;
-    private int threeBallCounter = 0;
+    private int threeBallHighCounter = 0;
+    private int threeBallHighLowCounter = 0;
 
     //CONSTANTS:
     private final double encCountsPerFoot = 11.1029532;
@@ -36,7 +37,7 @@ public class Autonomous {
     }
 
     private enum routines{
-        NOTHING, ONEBALL, TWOBALL, THREEBALL
+        NOTHING, ONEBALL, TWOBALL, THREEBALLHIGH, THREEBALLHIGHLOW
     }
 
     private routines routineState = routines.NOTHING;
@@ -53,14 +54,20 @@ public class Autonomous {
         routineState = routines.TWOBALL;
     }
 
-    public void setThreeBall(){
-        routineState = routineState.THREEBALL;
+    public void setThreeBallHigh(){
+        routineState = routines.THREEBALLHIGH;
     }
+
+    public void setThreeBallHighLow(){
+        routineState = routines.THREEBALLHIGHLOW;
+    }
+
 
     public void display(){
         SmartDashboard.putNumber("One Ball Counter", oneBallCounter);
         SmartDashboard.putNumber("Two Ball Counter", twoBallCounter);
-        SmartDashboard.putNumber("Three Ball Counter", threeBallCounter);
+        SmartDashboard.putNumber("Three Ball High Counter", threeBallHighCounter);
+        SmartDashboard.putNumber("Three Ball High Low Counter", threeBallHighLowCounter);
         SmartDashboard.putNumber("Encoder Counts", encoder.getPosition());
         SmartDashboard.putNumber("Gyro Yaw", gyro.getYaw());
         SmartDashboard.putBoolean("CheckRPM", shooter.checkRPM());
@@ -71,7 +78,8 @@ public class Autonomous {
         gyro.reset();
         oneBallCounter = 0;
         twoBallCounter = 0;
-        threeBallCounter = 0;
+        threeBallHighCounter = 0;
+        threeBallHighLowCounter = 0;
     }
 
     private double convertFeetToEncoderCounts(double feet){
@@ -236,13 +244,167 @@ public class Autonomous {
         }
     }
 
-    private void threeBall(){
-        switch(threeBallCounter){
-            case 0:
-            //????????????????????????????
+    private void threeLowHighBall(){        //TWO BALL HIGH, ONE BALL LOW
+        switch(threeBallHighLowCounter){   
+            case 0: 
+            if (encoder.getPosition() <= -13.6) {
+                drive.tankRun(0, 0); 
+                encoder.setPosition(0); 
+                threeBallHighLowCounter++; 
+            } else {
+                drive.tankRun(-0.60, -0.57); 
+            }
+            break; 
+
+            case 1:
+            if(shooter.checkRPM()){                 //shoot preload into low hub
+                threeBallHighLowCounter++;
+            }
+
+            else{
+                shooter.setLowHubShoot();
+            }
             break;
+
+            case 2:
+            if(intake.cargoCheck()){
+                intake.setStopMode();
+                shooter.setStop();
+                threeBallHighLowCounter++;
+            }
+
+            else{
+                intake.setFeedingMode();
+            }
+            break;
+
+            case 3:                                                 //turn right to ball by the wall
+            if(gyro.getYaw() < 146 && gyro.getYaw() > 140){
+                drive.tankRun(0, 0);
+                encoder.setPosition(0);
+                threeBallHighLowCounter++;
+            }
+
+            else{
+                drive.tankRun(0.45, -0.45);
+            }
+            break;
+
+            case 4:                                                   //forward and intake 2nd ball
+            if(!intake.cargoCheck() || encoder.getPosition() > 71.5){       
+                drive.tankRun(0, 0);
+                encoder.setPosition(0);
+                threeBallHighLowCounter++;
+            }
+            else{
+                intake.setIntakeMode();
+                drive.tankRun(0.65, 0.65);
+            }
+            break;
+
+            case 5:
+            if(Math.abs(encoder.getPosition()) >= convertFeetToEncoderCounts(1.5)){           //back up a foot and a half so you dont hit the wall when you turn around
+                drive.tankRun(0, 0);
+                encoder.setPosition(0);
+                gyro.reset();
+                threeBallHighLowCounter++;
+            }
+            else{
+                drive.tankRun(-0.53, -0.50);
+            }
+            break;                                                                  //reset gyro here and we should know what the gyro needs to be for the third ball
+
+            case 6:
+            if(gyro.getYaw() > -143f && gyro.getYaw() < -137){                              //turn left to face hub
+                drive.tankRun(0, 0);   
+                encoder.setPosition(0);
+                threeBallHighLowCounter++;
+            }
+            else{
+                drive.tankRun(-0.55, 0.52);
+            }
+            break;
+
+            case 7:                                                              //rev the shooter                         
+            if(shooter.checkRPM()){
+                threeBallHighLowCounter++;
+            }
+            else{
+                //shooter.setUpperHubShoot();
+                shooter.setLowHubShoot();
+            }      
+            break;
+            
+            case 8:                                                                              //shoot the 2nd ball
+                if(intake.cargoCheck()){
+                    shooter.setStop();
+                    intake.setStopMode();
+                    threeBallHighLowCounter++;
+                }
+                else{
+                    intake.setFeedingMode();
+                }
+            break;                                                                                  //gyro at -7.6
+
+            case 9:                                                                                 //gyro to -100
+            if(gyro.getYaw() > 117f && gyro.getYaw() < 123f){                              //turn left to face third ball   [CONSIDER MAKING THIS FASTER!]
+                drive.tankRun(0, 0);   
+                encoder.setPosition(0);
+                threeBallHighLowCounter++;
+            }
+            else{
+                drive.tankRun(-0.40, 0.37);
+            }
+            break;
+
+            case 10:                                                                 //foward and intake 3rd ball
+            if(!intake.cargoCheck() || encoder.getPosition() >= 98){                                       //start: 2 - end: 94
+                drive.tankRun(0, 0);
+                threeBallHighLowCounter++;
+            }
+            else{
+                intake.setIntakeMode();
+                drive.tankRun(0.70, 0.70);
+            }
+            break;
+
+            case 11:
+            if(gyro.getYaw() > -143f && gyro.getYaw() < -137f){                              //turn right to face hub
+                drive.tankRun(0, 0);   
+                intake.setStopMode();
+                encoder.setPosition(0);
+                threeBallHighLowCounter++;
+            }
+            else{
+                drive.tankRun(0.6, -0.6);
+            }
+            break;
+
+            case 12:                                                              //rev the shooter                         
+            if(shooter.checkRPM()){
+                threeBallHighLowCounter++;
+            }
+            else{
+                //shooter.setUpperHubShoot();
+                shooter.setLowHubShoot();
+            }      
+            break;
+            
+            case 13:                                                                              //shoot the 3rd ball
+                if(intake.cargoCheck()){
+                    shooter.setStop();
+                    intake.setStopMode();
+                    threeBallHighLowCounter++;
+                }
+                else{
+                    intake.setFeedingMode();
+                }
+            break;
+
+
         }
     }
+
 
     public void run(){
         switch(routineState){
@@ -258,8 +420,12 @@ public class Autonomous {
                 twoBall();
             break;
 
-            case THREEBALL:
-                threeBall();
+            case THREEBALLHIGH:
+                twoBall();
+            break;
+
+            case THREEBALLHIGHLOW:
+                threeLowHighBall();
             break;
 
         }

@@ -105,7 +105,7 @@ public class Robot extends TimedRobot {
     shooter.displayValues();
     SmartDashboard.putNumber("Shooter Output", shooterMotor.get());
     SmartDashboard.putNumber("Encoder Counts", encoder.getPosition());
-    //autonomous.display();
+    autonomous.display();
   }
 
   /**
@@ -123,6 +123,8 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    autonomous.reset();
   }
 
   /** This function is called periodically during autonomous. */
@@ -201,7 +203,6 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    autonomous.reset();
   }
 
   /** This function is called periodically when disabled. */
@@ -220,8 +221,8 @@ public class Robot extends TimedRobot {
       autonomous.setTwoBall();
     }
     else if(joystick.getRawButton(4)){
-      SmartDashboard.putString("ROUTINE", "THREE BALL");
-      autonomous.setThreeBall();
+      SmartDashboard.putString("ROUTINE", "THREE BALL HIGH LOW");
+      autonomous.setThreeBallHighLow();
     }
   }
 

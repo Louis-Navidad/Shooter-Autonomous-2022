@@ -4,7 +4,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.cameraserver.CameraServer;
 
-public class Camera {
+public class Camera {   //RASBERRY PI SETUP REQUIRES NO CODE
 
     private UsbCamera camera;
 
