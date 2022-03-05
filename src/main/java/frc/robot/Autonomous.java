@@ -66,19 +66,22 @@ public class Autonomous {
 
 
     public void display(){
+        //SENSOR VALUES:
+        SmartDashboard.putNumber("Encoder Counts", encoder.getPosition());
+        SmartDashboard.putNumber("Gyro Yaw", gyro.getYaw());
+
+        //ROUTINE COUNTERS:
         SmartDashboard.putNumber("One Ball Counter", oneBallCounter);
         SmartDashboard.putNumber("Two Ball Counter", twoBallCounter);
         SmartDashboard.putNumber("Three Ball High Counter", threeBallHighCounter);
         SmartDashboard.putNumber("Three Ball High Low Counter", threeBallLowCounter);
-        SmartDashboard.putNumber("Encoder Counts", encoder.getPosition());
-        SmartDashboard.putNumber("Gyro Yaw", gyro.getYaw());
-        SmartDashboard.putBoolean("CheckRPM", shooter.checkRPM());
     }
 
     public void reset(){
+        limelight.setTrackingMode();
         encoder.setPosition(0);
         gyro.reset();
-        limelight.setTrackingMode();
+    
         oneBallCounter = 0;
         twoBallCounter = 0;
         threeBallHighCounter = 0;

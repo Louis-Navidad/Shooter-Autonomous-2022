@@ -92,7 +92,7 @@ public class Intake {
     }
 
     public void displayMethod(){
-        SmartDashboard.putBoolean("Limit switch", cargoCheck()); // displays if the limit switch is being triggered
+        SmartDashboard.putBoolean("Intake Switch", cargoCheck()); // displays if the limit switch is being triggered
         SmartDashboard.putString("Mode", mode.toString()); // displays the current state of the intake
         SmartDashboard.putNumber("Timer", timer.get());
     }

@@ -17,7 +17,7 @@ public class Drive {
     }
 
     private double deadzone(double input){
-        if(Math.abs(input) > 0.2){
+        if(Math.abs(input) > 0.1){
             return input;
         }
         else{
@@ -25,10 +25,12 @@ public class Drive {
         }
     }
 
+    //IMPLEMENTS DEADZONE
     public void arcadeControl(double xChannel, double yChannel){
         diffDrive.arcadeDrive(deadzone(-xChannel), deadzone(yChannel));
     }
 
+    //NO DEADZONES
     public void arcadeRun(double xChannel, double yChannel){
         diffDrive.arcadeDrive(-xChannel, yChannel);
     }

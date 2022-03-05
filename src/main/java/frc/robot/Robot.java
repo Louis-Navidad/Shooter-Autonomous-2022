@@ -1,26 +1,31 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
+// spooky pookie cuddlemuffin i love edrich soooooooo much 
 
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //MOTOR IMPORTS:
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-//OTHER IMPORTS:
-import edu.wpi.first.wpilibj.Joystick;
+//SENSOR IMPORTS:
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.SPI.Port;
+
+//OTHER IMPORTS:
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -35,26 +40,29 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
 
-  //drive
-  private CANSparkMax leftDriveMotor1;
-  private CANSparkMax leftDriveMotor2;
-  private CANSparkMax rightDriveMotor1;
-  private CANSparkMax rightDriveMotor2;
-  private RelativeEncoder encoder;
-  //shooter + intake
-  private WPI_TalonFX shooterMotor;
-  private WPI_TalonSRX intakeMotor;
-  private DigitalInput intakeSwitch;
-  private Timer intakeTimer;
+  //DRIVE VARIABLES:
+  private CANSparkMax leftDriveMotor1;    //CAN ID:   7
+  private CANSparkMax leftDriveMotor2;    //CAN ID:   8
+  private CANSparkMax rightDriveMotor1;   //CAN ID:   5
+  private CANSparkMax rightDriveMotor2;   //CAN ID:   6
+  private RelativeEncoder encoder;        //dont know which motor to use for encoder yet
+
+  //SHOOTER + INTAKE VARIABLES:
+  private WPI_TalonFX shooterMotor;       //CAN ID:   1
+  private WPI_TalonSRX intakeMotor;       //CAN ID:   3 
+  private DigitalInput intakeSwitch;      //DIO Port: ?  
+  private Timer intakeTimer;              
 
   //CLASS VARIABLES:
+  private Joystick joystick;        
   private Drive drive;
-  private Joystick joystick;
   private Limelight limelight;
   private Shooter shooter;
   private Intake intake;
   private AHRS navX;
   private Autonomous autonomous;
+
+  private double setSpeed;
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -65,30 +73,37 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-
-    //MOTOR INITIALIZATIONS:
     
-    //drive
-    leftDriveMotor1 = new CANSparkMax(6, MotorType.kBrushless);         //using ports on practice robot
-    leftDriveMotor2 = new CANSparkMax(15, MotorType.kBrushless);  
-    rightDriveMotor1 = new CANSparkMax(16, MotorType.kBrushless);
-    rightDriveMotor2 = new CANSparkMax(3, MotorType.kBrushless);
-    encoder = rightDriveMotor2.getEncoder();
+    //DRIVE:
+    leftDriveMotor1 = new CANSparkMax(7, MotorType.kBrushless);         
+    leftDriveMotor2 = new CANSparkMax(8, MotorType.kBrushless);  
+    rightDriveMotor1 = new CANSparkMax(5, MotorType.kBrushless);
+    rightDriveMotor2 = new CANSparkMax(6, MotorType.kBrushless);
+    encoder = leftDriveMotor1.getEncoder();
+    
+    //sets the motors to be in coast mode
+    leftDriveMotor1.setIdleMode(IdleMode.kCoast);
+    leftDriveMotor2.setIdleMode(IdleMode.kCoast);
+    rightDriveMotor1.setIdleMode(IdleMode.kCoast);
+    rightDriveMotor2.setIdleMode(IdleMode.kCoast);
   
-    //shooter + intake
+    //SHOOTER + INTAKE:
     shooterMotor = new WPI_TalonFX(1);
-    intakeMotor = new WPI_TalonSRX(8);
-    intakeSwitch = new DigitalInput(2);
+    intakeMotor = new WPI_TalonSRX(3);
+    intakeSwitch = new DigitalInput(2);   //NOT ON ROBOT YET
     intakeTimer = new Timer();
 
-    //CLASS INITIALIZATIONS:
-    drive = new Drive(leftDriveMotor1, leftDriveMotor2, rightDriveMotor1, rightDriveMotor2);
+    //CLASSES:
     joystick = new Joystick(0);
-    limelight = new Limelight();
-    intake = new Intake(intakeMotor, intakeSwitch, intakeTimer);
-    shooter = new Shooter(limelight, shooterMotor, drive);
+    drive = new Drive(leftDriveMotor1, leftDriveMotor2, rightDriveMotor1, rightDriveMotor2);
     navX = new AHRS(Port.kMXP);
-    autonomous = new Autonomous(drive, shooter, intake, encoder, navX);
+
+    limelight = new Limelight();    //NOT ON ROBOT YET
+    shooter = new Shooter(limelight, shooterMotor, drive);
+
+    intake = new Intake(intakeMotor, intakeSwitch, intakeTimer); 
+    
+    autonomous = new Autonomous(drive, shooter, intake, encoder, navX, limelight);
     
   }
 
@@ -101,11 +116,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    //intake.displayMethod();
-    shooter.displayValues();
-    SmartDashboard.putNumber("Shooter Output", shooterMotor.get());
-    SmartDashboard.putNumber("Encoder Counts", encoder.getPosition());
-    autonomous.display();
+    //shooter.displayValues();
+
+    //USED TO CHECK IF SHOOTER SENSOR IS WORKING FOR NOW
+    double shooterRPM = (shooterMotor.getSelectedSensorVelocity() * 600)/2048;
+    SmartDashboard.putNumber("Shooter RPM", shooterRPM);
+
+    //SmartDashboard.putNumber("Set Speed", SmartDashboard.getNumber("Set Speed", 0));
+    SmartDashboard.putNumber("Motor Output", shooterMotor.get()); 
   }
 
   /**
@@ -124,7 +142,7 @@ public class Robot extends TimedRobot {
     m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
 
-    autonomous.reset();
+    //autonomous.reset();
   }
 
   /** This function is called periodically during autonomous. */
@@ -140,64 +158,43 @@ public class Robot extends TimedRobot {
         break;
     }
 
-    autonomous.run();
+    //autonomous.display();
+    //autonomous.run();
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    limelight.setDrivingMode();
+    //limelight.setDrivingMode;
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    //DRIVE:
     drive.arcadeControl(joystick.getX(), joystick.getY()); 
 
     if(joystick.getRawButton(1)){
+      //shooter.setTesting();
+      //shooter.setManual(SmartDashboard.getNumber("Set Speed", 0));
       shooter.setLowHubShoot();
-      //shooterMotor.set(-.795);
     }
-    /*else if(joystick.getRawButton(3)){
-      //shooter.setUpperHubShoot();
-    }
-    else if(joystick.getRawButton(4)){
-      //shooter.setLaunchPadShoot();
-    }*/
     else{
       shooter.setStop();
-      //shooterMotor.set(0);
     }
-    //shooterMotor.set(joystick.getRawAxis(3));
 
+    //TEST INTAKE
     if(joystick.getRawButton(2)){
-      intake.setFeedingMode();
-      //intake.setOverrideMode();
-    }
-    else if(joystick.getRawButton(11)){
-      intake.setIntakeMode();
+      intakeMotor.set(-1);
     }
     else if(joystick.getPOV() == 0){
-      intake.setOutakeMode();
+      intakeMotor.set(0.5);
     }
     else{
-      intake.setStopMode();
+      intakeMotor.stopMotor();
     }
 
-    if(joystick.getRawButton(9)){
-      limelight.setDrivingMode();
-    }
-    else if(joystick.getRawButton(10)){
-      limelight.setTrackingMode();
-    }
-
-    if(joystick.getRawButton(7)){
-      encoder.setPosition(0);
-    }
-
-    limelight.run();
     shooter.run();
-    intake.run();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -221,8 +218,8 @@ public class Robot extends TimedRobot {
       autonomous.setTwoBall();
     }
     else if(joystick.getRawButton(4)){
-      SmartDashboard.putString("ROUTINE", "THREE BALL HIGH LOW");
-      autonomous.setThreeBallHighLow();
+      SmartDashboard.putString("ROUTINE", "THREE BALL LOW");
+      autonomous.setThreeBallLow();
     }
   }
 
