@@ -135,6 +135,8 @@ public class Autonomous {
 
             case 1:     //rev shooter a& bring intake down
                 if(shooter.checkRPM() && intake.armIsDown() && shooter.checkAligned() && shooter.checkInRange()){
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     oneBallCounter++;
                 }
                 else{
@@ -145,6 +147,7 @@ public class Autonomous {
                     
                     //shooter.setUpperHubShoot
                     intake.setExtend();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }
             break;
 
@@ -190,6 +193,8 @@ public class Autonomous {
 
             case 1:     //rev the shooter & bring arm down                         
                 if(shooter.checkRPM() && intake.armIsDown() && shooter.checkAligned() && shooter.checkInRange()){
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     twoBallACounter++;
                 }
                 else{
@@ -199,7 +204,8 @@ public class Autonomous {
                     //
                     
                     //shooter.setUpperHubShoot();
-                    intake.setExtend();;
+                    intake.setExtend();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }      
             break;
                 
@@ -272,6 +278,8 @@ public class Autonomous {
 
             case 7:     //rev the shooter
                 if(shooter.checkRPM() && shooter.checkAligned() && shooter.checkInRange()){
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     twoBallACounter++;
                 }
                 else{
@@ -281,6 +289,7 @@ public class Autonomous {
                     //
 
                     //shooter.setUpperHubShoot();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }
             break;
 
@@ -340,6 +349,8 @@ public class Autonomous {
 
             case 1:
                 if(shooter.checkRPM() && intake.armIsDown() && shooter.checkAligned() && shooter.checkInRange()){                 //shoot preload into low hub
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     threeBallLowCounter++;
                 }
 
@@ -351,6 +362,7 @@ public class Autonomous {
 
                     intake.setExtend();
                     //shooter.setLowHubShoot();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }
             break;
 
@@ -426,6 +438,8 @@ public class Autonomous {
 
             case 7:                                                              //rev the shooter                         
                 if(shooter.checkRPM() && shooter.checkAligned() && shooter.checkInRange()){
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     threeBallLowCounter++;
                 }
                 else{
@@ -435,6 +449,7 @@ public class Autonomous {
                     //
 
                     //shooter.setUpperHubShoot();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }      
             break;
             
@@ -495,6 +510,8 @@ public class Autonomous {
 
             case 12:                                                              //rev the shooter                         
                 if(shooter.checkRPM() && shooter.checkAligned() && shooter.checkInRange()){
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     threeBallLowCounter++;
                 }
                 else{
@@ -504,6 +521,7 @@ public class Autonomous {
                     //
 
                     //shooter.setUpperHubShoot();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }      
             break;
             
@@ -543,6 +561,8 @@ public class Autonomous {
 
             case 1:
                 if(shooter.checkRPM() && intake.armIsDown() && shooter.checkAligned() && shooter.checkInRange()){                 //shoot preload into high hub
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     threeBallHighCounter++;
                 }
 
@@ -554,6 +574,7 @@ public class Autonomous {
 
                     intake.setExtend();
                     //shooter.setUpperHubShoot();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }
             break;
 
@@ -629,6 +650,8 @@ public class Autonomous {
 
             case 7:                                                              //rev the shooter                         
                 if(shooter.checkRPM() && shooter.checkAligned() && shooter.checkInRange()){
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     threeBallHighCounter++;
                 }
                 else{
@@ -638,6 +661,7 @@ public class Autonomous {
                     //
 
                     //shooter.setUpperHubShoot();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }      
             break;
             
@@ -698,6 +722,8 @@ public class Autonomous {
 
             case 12:                                                              //rev the shooter                         
                 if(shooter.checkRPM() && shooter.checkAligned() && shooter.checkInRange()){
+                    drive.arcadeRun(0, 0);
+                    encoder.setPosition(0);
                     threeBallHighCounter++;
                 }
                 else{
@@ -707,6 +733,7 @@ public class Autonomous {
                     //
 
                     //shooter.setUpperHubShoot();
+                    drive.arcadeRun(shooter.alignSpeed, shooter.getInRangeSpeed);
                 }      
             break;
             
