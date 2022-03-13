@@ -80,6 +80,11 @@ public class Shooter{
         if(shooterState == state.STOP){
             return false;
         }
+        //DELETE LATER
+        else if(shooterState == state.TESTING){
+            return true;
+        }
+        //
         else{
             return pid.atSetpoint();
         }
@@ -252,8 +257,13 @@ public class Shooter{
 
         align();
         getInRangeSpeed = 0;
-        
+
         shooterMotor.set(setSpeed(launchPadRPM));
+    }
+
+    private void testing(){
+        align();
+        getInRange();
     }
 
     public void run(){
@@ -271,7 +281,7 @@ public class Shooter{
                 launchPadShoot();
             break;
             case TESTING:
-               
+               testing();
             break;
         }
 
