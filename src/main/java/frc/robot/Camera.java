@@ -4,13 +4,14 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.cameraserver.CameraServer;
 
-public class Camera {
+public class Camera {   //RASBERRY PI SETUP REQUIRES NO CODE
 
     private UsbCamera camera;
 
     public Camera(int width, int height, int port){
         camera = CameraServer.startAutomaticCapture(port);
         camera.setExposureAuto();
+        camera.setWhiteBalanceAuto();
         camera.setVideoMode(PixelFormat.kMJPEG, width, height, 30);
     }
     
@@ -18,11 +19,11 @@ public class Camera {
         this(160, 120, port);
     }
 
-    public void setExposure(int exposureValue){
-        camera.setExposureManual(exposureValue);
-    }
-
     public void setResolution(int width, int height){
         camera.setResolution(width, height);
+    }
+
+    public void setExposure(int exposure){
+        camera.setExposureManual(exposure);
     }
 }

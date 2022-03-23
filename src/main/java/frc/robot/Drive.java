@@ -17,7 +17,7 @@ public class Drive {
     }
 
     private double deadzone(double input){
-        if(Math.abs(input) > 0.2){
+        if(Math.abs(input) > 0.1){
             return input;
         }
         else{
@@ -25,11 +25,18 @@ public class Drive {
         }
     }
 
-    public void arcadeRun(double xChannel, double yChannel){
-        diffDrive.arcadeDrive(-deadzone(xChannel), deadzone(yChannel));
+    //ARCADE WITH DEADZONE
+    public void arcadeControl(double xChannel, double yChannel){
+        diffDrive.arcadeDrive(deadzone(-xChannel), deadzone(yChannel));
     }
 
+    //ARCADE WITH NO DEADZONE
+    public void arcadeRun(double xChannel, double yChannel){
+        diffDrive.arcadeDrive(-xChannel, yChannel);
+    }
+
+    //TANK WITH NO DEADZONE
     public void tankRun(double leftChannel, double rightChannel){
-        diffDrive.tankDrive(deadzone(leftChannel), deadzone(rightChannel));
+        diffDrive.tankDrive(-leftChannel, rightChannel);
     }
 }
