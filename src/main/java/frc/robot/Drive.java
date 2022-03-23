@@ -25,16 +25,17 @@ public class Drive {
         }
     }
 
-    //IMPLEMENTS DEADZONE
+    //ARCADE WITH DEADZONE
     public void arcadeControl(double xChannel, double yChannel){
         diffDrive.arcadeDrive(deadzone(-xChannel), deadzone(yChannel));
     }
 
-    //NO DEADZONES
+    //ARCADE WITH NO DEADZONE
     public void arcadeRun(double xChannel, double yChannel){
         diffDrive.arcadeDrive(-xChannel, yChannel);
     }
 
+    //TANK WITH NO DEADZONE
     public void tankRun(double leftChannel, double rightChannel){
         diffDrive.tankDrive(-leftChannel, rightChannel);
     }
